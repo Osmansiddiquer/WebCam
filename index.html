@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Camera</title>
+</head>
+<body>
+    <div class= 'video-container'>
+        <video id = "video" allow="camera"></video>
+        <canvas id="video-canvas"></canvas>
+        <button id="snap"></button>
+    </div>
+    <div class="sliders">
+        <div class="slidecontainer">
+            <label for="brightness">Brightness:</label>
+            <input type="range" min="0" max="100" value="50" class="slider" id="brightness">
+            <span id="brightness-value">50</span>
+        </div>
+        <div class="slidecontainer">
+            <label for="contrast">Contrast:</label>
+            <input type="range" min="0" max="100" value="50" class="slider" id="contrast">
+            <span id="contrast-value">50</span>
+        </div>
+        <div class="slidecontainer">
+            <label for="saturation">Saturation:</label>
+            <input type="range" min="0" max="100" value="100" class="slider" id="saturation">
+            <span id="saturation-value">100</span>
+        </div>
+        <div class="slidecontainer">
+            <label for="exposure">Exposure:</label>
+            <input type="range" min="1" max="100" value="5" class="slider" id="exposure">
+            <span id="exposure-value">auto</span>
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
