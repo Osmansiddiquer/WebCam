@@ -4,6 +4,7 @@ let cameraPromise = navigator.mediaDevices.getUserMedia({
     }
 })
 
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 const video = document.querySelector("#video");
 const snap = document.getElementById('snap');
 const canvas = document.getElementById("video-canvas")
@@ -16,17 +17,19 @@ cameraPromise.then((stream) => {
     video.onloadedmetadata = () => {
         video.play();
     };
-
     track = stream.getVideoTracks()[0];
+    let exposureSupported = track.getCapabilities()['exposureTime'] != undefined;
+    if(!exposureSupported){
+        console.error("Exposure control is not supported");
+        document.getElementById("exposure-value").innerText = "Not Supported"
+        document.getElementById("exposure").remove();
+        document.getElementById("auto-exposure").remove();
+    }
     console.log('The device supports the following capabilities: ', track.getCapabilities());
-    track.applyConstraints({
-        advanced: [
-            {exposureMode: 'manual'}
-        ]})
 })
 .then(() => setInterval(() => {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = clamp(video.videoWidth*window.innerWidth/1400, 500, 10000);
+    canvas.height = canvas.width*480/640;
 
     let ctx = canvas.getContext('2d');
     ctx.translate(canvas.width, 0);
@@ -67,12 +70,17 @@ for(let slider of sliders){
                 break;
             case "exposure":
                 exposure = (5000**(1/100))**this.value + 3;
+                exposure = clamp(Math.floor(exposure), 3, 5000)
+                track.applyConstraints({
+                    advanced: [
+                        {exposureMode: "manual"}
+                    ]})
                 track.applyConstraints({
                 advanced: [
-                        {exposureTime: exposure}
+                    {exposureTime: exposure}
                 ]})
         }
-        if(slider.id == "exposure") output.innerHTML = Math.floor(exposure);
+        if(slider.id == "exposure") output.innerHTML = exposure;
         else output.innerHTML = this.value;
     }
 
@@ -93,6 +101,23 @@ for(let slider of sliders){
     else output.innerHTML = slider.value;
 }
 
+document.getElementById("auto-exposure").addEventListener("click", ()=>{
+    track.applyConstraints({
+    advanced: [
+        {exposureMode: "continuous"}
+    ]})
+    document.getElementById("exposure-value").innerText = "auto";
+})
+
+let menu_open = false;
+document.getElementById("open-btn").addEventListener('click', (e)=>{
+    menu_open = !menu_open;
+    document.getElementById("sliders-container").classList.toggle('open')
+    if(menu_open)
+        e.target.style.rotate = "180deg";
+    else
+        e.target.style.rotate = "360deg";
+})
 
 // example of callback hell
 let data = "";
